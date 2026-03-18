@@ -1134,8 +1134,40 @@
                           <input required type="number" min="0" className="input-field" value={formData.price} onChange={e=>upd('price',e.target.value)}/>
                         </div>
                         <div>
-                          <label style={{display:'block',fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'13px',textTransform:'uppercase',letterSpacing:'0.08em',color:'var(--iron)',marginBottom:'5px'}}>URL de imagen</label>
-                          <input type="text" className="input-field" value={formData.image} onChange={e=>upd('image',e.target.value)}/>
+                          <label style={{display:'block',fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'13px',textTransform:'uppercase',letterSpacing:'0.08em',color:'var(--iron)',marginBottom:'8px'}}>Imagen del producto</label>
+                          <div style={{display:'flex',gap:'10px',alignItems:'flex-start'}}>
+                            {/* Preview */}
+                            <div style={{width:'72px',height:'72px',borderRadius:'6px',border:'2px dashed #ddd7ce',background:'var(--offwhite)',overflow:'hidden',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center'}}>
+                              {formData.image
+                                ? <img src={formData.image} alt="preview" style={{width:'100%',height:'100%',objectFit:'cover'}}/>
+                                : <i className="fa-solid fa-image" style={{fontSize:'24px',color:'#c5bdb4'}}></i>
+                              }
+                            </div>
+                            {/* Buttons */}
+                            <div style={{flex:1,display:'flex',flexDirection:'column',gap:'6px'}}>
+                              <label style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'8px',background:'var(--steel)',color:'white',fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'14px',textTransform:'uppercase',letterSpacing:'0.05em',padding:'10px 14px',borderRadius:'6px',cursor:'pointer',transition:'background 0.15s'}}
+                                onMouseEnter={e=>e.currentTarget.style.background='var(--steel-light)'}
+                                onMouseLeave={e=>e.currentTarget.style.background='var(--steel)'}>
+                                <i className="fa-solid fa-upload"></i> Subir foto
+                                <input type="file" accept="image/*" style={{display:'none'}}
+                                  onChange={e=>{
+                                    const file = e.target.files[0];
+                                    if (!file) return;
+                                    const reader = new FileReader();
+                                    reader.onload = (ev) => upd('image', ev.target.result);
+                                    reader.readAsDataURL(file);
+                                  }}
+                                />
+                              </label>
+                              {formData.image && (
+                                <button type="button" onClick={()=>upd('image','')}
+                                  style={{background:'none',border:'1.5px solid #e8d5d5',color:'var(--rust)',fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'13px',textTransform:'uppercase',letterSpacing:'0.05em',padding:'6px 10px',borderRadius:'6px',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:'6px'}}>
+                                  <i className="fa-solid fa-trash"></i> Quitar
+                                </button>
+                              )}
+                              <p style={{fontSize:'11px',color:'var(--silver)',margin:0,lineHeight:1.4}}>JPG, PNG, WEBP. Se guarda en la app.</p>
+                            </div>
+                          </div>
                         </div>
                         <div>
                           <label style={{display:'block',fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'13px',textTransform:'uppercase',letterSpacing:'0.08em',color:'var(--iron)',marginBottom:'5px'}}>Categoría</label>
@@ -1348,3 +1380,4 @@
     </script>
 </body>
 </html>
+
