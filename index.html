@@ -413,7 +413,14 @@
                     </div>
                   </div>
                   <div style={{display:'flex',alignItems:'center',gap:'2px'}}>
-                    <button onClick={()=>navigate('track_order')} style={{color:'var(--silver-light)',padding:'8px 10px',background:'transparent',border:'none',cursor:'pointer',fontFamily:'Barlow Condensed',fontWeight:600,fontSize:'13px',textTransform:'uppercase',letterSpacing:'0.05em',display:'flex',alignItems:'center',gap:'6px'}}>
+                    <a href="https://wa.me/5491179020960?text=Hola%20PitaElectricidad%2C%20quiero%20hacer%20una%20consulta" target="_blank" rel="noopener noreferrer"
+                      style={{display:'flex',alignItems:'center',gap:'6px',background:'#25D366',color:'white',padding:'6px 10px',borderRadius:'6px',border:'none',cursor:'pointer',textDecoration:'none',fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'13px',textTransform:'uppercase',letterSpacing:'0.04em',lineHeight:1,transition:'background 0.15s'}}
+                      onMouseEnter={e=>e.currentTarget.style.background='#1ebe5d'}
+                      onMouseLeave={e=>e.currentTarget.style.background='#25D366'}>
+                      <i className="fa-brands fa-whatsapp" style={{fontSize:'18px'}}></i>
+                      <span style={{display:'none'}} className="sm:inline">Consultar</span>
+                    </a>
+                    <button onClick={()=>navigate('track_order')} style={{color:'var(--silver-light)',padding:'8px 10px',background:'transparent',border:'none',cursor:'pointer',display:'flex',alignItems:'center',gap:'6px'}}>
                       <i className="fa-solid fa-clipboard-list" style={{fontSize:'18px'}}></i>
                     </button>
                     <button onClick={()=>navigate('cart')} style={{position:'relative',color:cartItemCount>0?'var(--yellow)':'var(--silver-light)',padding:'8px',background:'transparent',border:'none',cursor:'pointer'}}>
