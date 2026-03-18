@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PitaElectricidad</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        :root {
+            --steel: #1a1f2e;
+            --steel-mid: #252d3f;
+            --steel-light: #2e3a50;
+            --iron: #3d4a5c;
+            --yellow: #f5a623;
+            --yellow-hot: #ffb800;
+            --yellow-light: #ffd166;
+            --rust: #c0392b;
+            --rust-light: #e74c3c;
+            --silver: #8fa0b5;
+            --silver-light: #b8c9d9;
+            --offwhite: #f0ede8;
+            --warm-white: #faf8f5;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            background-color: var(--warm-white);
+            font-family: 'Barlow', sans-serif;
+            color: var(--steel);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3, h4, .font-display {
+            font-family: 'Barlow Condensed', sans-serif;
+        }
+
+        /* Metal texture pattern */
+        .metal-bg {
+            background-color: var(--steel);
+            background-image: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(255,255,255,0.015) 2px,
+                    rgba(255,255,255,0.015) 4px
+                );
+        }
+
+        .metal-plate {
+            background: linear-gradient(135deg, var(--steel-mid) 0%, var(--steel) 50%, var(--steel-light) 100%);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        /* Yellow warning stripe */
+        .hazard-stripe {
+            background: repeating-linear-gradient(
+                -45deg,
+                var(--yellow),
+                var(--yellow) 10px,
+                var(--steel) 10px,
+                var(--steel) 20px
+            );
+        }
+
+        .hazard-stripe-light {
+            background: repeating-linear-gradient(
+                -45deg,
+                var(--yellow),
+                var(--yellow) 8px,
+                #1a1f2e 8px,
+                #1a1f2e 16px
+            );
+        }
+
+        /* Bolt/rivet decorative element */
+        .rivet {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, var(--silver-light), var(--iron));
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.5), 0 1px 0 rgba(255,255,255,0.1);
+            flex-shrink: 0;
+        }
+
+        /* Category card hover */
+        .cat-card {
+            background: var(--warm-white);
+            border: 2px solid #e8e2d9;
+            transition: all 0.18s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .cat-card::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--yellow);
+            transform: scaleX(0);
+            transition: transform 0.18s ease;
+        }
+        .cat-card:hover {
+            border-color: var(--yellow);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(245,166,35,0.18);
+        }
+        .cat-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        /* Product card */
+        .prod-card {
+            background: white;
+            border: 1.5px solid #e8e2d9;
+            transition: all 0.18s ease;
+            overflow: hidden;
+        }
+        .prod-card:hover {
+            border-color: var(--yellow);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+            transform: translateY(-2px);
+        }
+        .prod-card:active { transform: scale(0.98); }
+
+        /* Price tag */
+        .price-tag {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 800;
+        }
+
+        /* Offer badge */
+        .offer-badge {
+            background: var(--rust);
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        /* Input styles */
+        .input-field {
+            background: var(--offwhite);
+            border: 2px solid #ddd7ce;
+            border-radius: 6px;
+            padding: 12px 14px;
+            width: 100%;
+            font-family: 'Barlow', sans-serif;
+            font-size: 15px;
+            color: var(--steel);
+            outline: none;
+            transition: border-color 0.15s;
+        }
+        .input-field:focus {
+            border-color: var(--yellow);
+        }
+
+        /* Primary button */
+        .btn-primary {
+            background: var(--yellow);
+            color: var(--steel);
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 800;
+            font-size: 18px;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .btn-primary:hover { background: var(--yellow-hot); box-shadow: 0 4px 16px rgba(245,166,35,0.4); }
+        .btn-primary:active { transform: scale(0.97); }
+
+        .btn-dark {
+            background: var(--steel);
+            color: white;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 800;
+            font-size: 17px;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .btn-dark:hover { background: var(--steel-light); }
+
+        /* Status badges */
+        .status-nuevo { background: #dbeafe; color: #1e40af; }
+        .status-prep { background: #fef3c7; color: #92400e; }
+        .status-preparado { background: #ede9fe; color: #5b21b6; }
+        .status-entregado { background: #dcfce7; color: #166534; }
+        .status-enviado { background: #dcfce7; color: #166534; }
+        .status-cancelado { background: #fee2e2; color: #991b1b; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--offwhite); }
+        ::-webkit-scrollbar-thumb { background: var(--silver); border-radius: 3px; }
+
+        /* Print */
+        @media print {
+            body { background: white !important; }
+            .print\:hidden { display: none !important; }
+            .print\:block { display: block !important; }
+        }
+
+        /* Animations */
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .anim-in { animation: fadeSlideIn 0.25s ease forwards; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .slide-up { animation: slideUp 0.3s ease forwards; }
+
+        /* Admin sidebar */
+        .admin-nav-item {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s;
+            color: var(--silver-light);
+        }
+        .admin-nav-item:hover { background: rgba(255,255,255,0.07); color: white; }
+        .admin-nav-item.active { background: var(--yellow); color: var(--steel); }
+
+        /* Offers carousel scroll */
+        .offers-scroll {
+            overflow-x: auto;
+            display: flex;
+            gap: 16px;
+            padding-bottom: 12px;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+        }
+        .offers-scroll::-webkit-scrollbar { height: 3px; }
+        .offers-scroll > * { scroll-snap-align: start; flex-shrink: 0; }
+
+        /* Section header line */
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .section-header h2 {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--steel);
+            white-space: nowrap;
+        }
+        .section-line {
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(to right, #e8e2d9, transparent);
+        }
+
+        /* Top nav shadow */
+        .topnav-shadow {
+            box-shadow: 0 2px 12px rgba(0,0,0,0.35);
+        }
+
+        /* Cart badge pulse */
+        @keyframes cartPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        .cart-badge { animation: cartPulse 0.3s ease; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+
+        const { useState, useMemo, useCallback } = React;
+
+        // ── HELPERS ──────────────────────────────────────────────────────────
+        const formatPrice = (p) =>
+            new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(p);
+        const getProductPrice = (p) => p.isOffer ? p.offerPrice : p.price;
+        const catIcons = { 1: 'fa-bolt', 2: 'fa-lightbulb', 3: 'fa-screwdriver-wrench', 4: 'fa-mug-hot', 5: 'fa-car' };
+
+        const initialCategories = [
+          { id: 1, name: 'Eléctricos',  order: 1 },
+          { id: 2, name: 'Iluminación', order: 2 },
+          { id: 3, name: 'Ferretería',  order: 3 },
+          { id: 4, name: 'Bazar',       order: 4 },
+          { id: 5, name: 'Juguetes',    order: 5 },
+        ];
+        const initialProducts = [
+          { id: 1, name: 'Cable unipolar 2.5mm',   desc: 'Rollo x 100m normalizado IRAM. Colores varios.',  price: 25000, categoryId: 1, image: 'https://placehold.co/400x400/1a1f2e/f5a623?text=Cable+2.5',       hasStock: true,  isOffer: true,  offerPrice: 22000 },
+          { id: 2, name: 'Llave Térmica 2x16A',    desc: 'Interruptor termomagnético bipolar.',             price: 8500,  categoryId: 1, image: 'https://placehold.co/400x400/1a1f2e/f5a623?text=Térmica',           hasStock: true,  isOffer: false },
+          { id: 3, name: 'Foco LED 9W',            desc: 'Luz fría 6500K. Rosca E27.',                     price: 1200,  categoryId: 2, image: 'https://placehold.co/400x400/1a1f2e/f5a623?text=Foco+LED',          hasStock: true,  isOffer: true,  offerPrice: 1000 },
+          { id: 4, name: 'Reflector LED 50W',      desc: 'Exterior IP65. Luz fría.',                       price: 15000, categoryId: 2, image: 'https://placehold.co/400x400/1a1f2e/f5a623?text=Reflector',         hasStock: false, isOffer: false },
+          { id: 5, name: 'Cinta Métrica 5m',       desc: 'Cinta reforzada con freno.',                     price: 4500,  categoryId: 3, image: 'https://placehold.co/400x400/1a1f2e/f5a623?text=Cinta',             hasStock: true,  isOffer: false },
+          { id: 6, name: 'Set Destornilladores',   desc: 'Set de 6 piezas imantados.',                     price: 11000, categoryId: 3, image: 'https://placehold.co/400x400/1a1f2e/f5a623?text=Destornilladores', hasStock: true,  isOffer: false },
+          { id: 7, name: 'Mate Acero Inoxidable',  desc: 'Doble pared térmica.',                           price: 8900,  categoryId: 4, image: 'https://placehold.co/400x400/1a1f2e/f5a623?text=Mate',             hasStock: true,  isOffer: false },
+          { id: 8, name: 'Auto Control Remoto 1:16',desc:'Escala 1:16 con baterías recargables.',          price: 35000, categoryId: 5, image: 'https://placehold.co/400x400/1a1f2e/f5a623?text=Auto+RC',          hasStock: true,  isOffer: true,  offerPrice: 29999 },
+        ];
+
+        // ── STATUS BADGE ─────────────────────────────────────────────────────
+        function StatusBadge({ status }) {
+          const colors = {
+            'Nuevo': 'background:#dbeafe;color:#1e40af',
+            'En preparación': 'background:#fef3c7;color:#92400e',
+            'Preparado': 'background:#ede9fe;color:#5b21b6',
+            'Entregado': 'background:#dcfce7;color:#166534',
+            'Enviado': 'background:#dcfce7;color:#166534',
+            'Cancelado': 'background:#fee2e2;color:#991b1b',
+          };
+          return (
+            <span style={{fontFamily:'Barlow Condensed',fontWeight:800,fontSize:'12px',textTransform:'uppercase',letterSpacing:'0.06em',padding:'3px 10px',borderRadius:'20px',display:'inline-block',...Object.fromEntries((colors[status]||'background:#f1f5f9;color:#64748b').split(';').map(s=>s.split(':')))}}>
+              {status}
+            </span>
+          );
+        }
+
+        // ── PRODUCT CARD ─────────────────────────────────────────────────────
+        function ProductCard({ product, onSelect }) {
+          const price = getProductPrice(product);
+          const discount = product.isOffer ? Math.round((1 - product.offerPrice / product.price) * 100) : 0;
+          return (
+            <div className="prod-card" style={{borderRadius:'8px',cursor:'pointer',display:'flex',flexDirection:'column',height:'100%'}}
+              onClick={() => onSelect(product)}>
+              <div style={{position:'relative',aspectRatio:'1/1',background:'#f0ede8',overflow:'hidden'}}>
+                <img src={product.image} alt={product.name} style={{width:'100%',height:'100%',objectFit:'cover',transition:'transform 0.3s ease'}}
+                  onMouseEnter={e=>e.target.style.transform='scale(1.05)'}
+                  onMouseLeave={e=>e.target.style.transform='scale(1)'}/>
+                {!product.hasStock && (
+                  <div style={{position:'absolute',inset:0,background:'rgba(26,31,46,0.75)',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                    <span style={{background:'var(--steel)',color:'var(--silver-light)',fontFamily:'Barlow Condensed',fontWeight:800,fontSize:'13px',textTransform:'uppercase',letterSpacing:'0.1em',padding:'4px 10px',border:'1px solid var(--silver)'}}>Sin Stock</span>
+                  </div>
+                )}
+                {product.isOffer && product.hasStock && (
+                  <div style={{position:'absolute',top:'8px',left:0,background:'var(--rust)',color:'white',fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'11px',textTransform:'uppercase',letterSpacing:'0.07em',padding:'3px 8px',boxShadow:'2px 2px 0 rgba(0,0,0,0.3)'}}>
+                    -{discount}% OFF
+                  </div>
+                )}
+              </div>
+              <div style={{padding:'10px 12px',display:'flex',flexDirection:'column',flex:1}}>
+                <p style={{fontSize:'13px',fontWeight:600,color:'var(--steel)',lineHeight:1.3,flex:1,marginBottom:'8px',display:'-webkit-box',WebkitLineClamp:2,WebkitBoxOrient:'vertical',overflow:'hidden'}}>{product.name}</p>
+                <div>
+                  {product.isOffer ? (
+                    <div>
+                      <span style={{fontFamily:'Barlow Condensed',fontWeight:800,fontSize:'20px',color:'var(--rust-light)'}}>{formatPrice(price)}</span>
+                      <span style={{fontSize:'11px',color:'#aaa',textDecoration:'line-through',marginLeft:'6px'}}>{formatPrice(product.price)}</span>
+                    </div>
+                  ) : (
+                    <span style={{fontFamily:'Barlow Condensed',fontWeight:800,fontSize:'20px',color:'var(--steel)'}}>{formatPrice(price)}</span>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        }
+
+        // ── TOP NAV ──────────────────────────────────────────────────────────
+        function TopNav({ cartItemCount, navigate }) {
+          return (
+            <div className="metal-bg topnav-shadow" style={{position:'sticky',top:0,zIndex:50}}>
+              <div className="hazard-stripe-light" style={{height:'4px'}}></div>
+              <div style={{padding:'12px 16px'}}>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',maxWidth:'960px',margin:'0 auto'}}>
+                  <div style={{display:'flex',alignItems:'center',gap:'10px',cursor:'pointer'}} onClick={()=>navigate('home')}>
+                    <div style={{background:'var(--yellow)',borderRadius:'4px',width:'32px',height:'32px',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                      <i className="fa-solid fa-bolt" style={{color:'var(--steel)',fontSize:'14px'}}></i>
+                    </div>
+                    <div>
+                      <h1 style={{fontFamily:'Barlow Condensed',fontWeight:900,fontSize:'22px',lineHeight:1,letterSpacing:'0.02em',color:'white',textTransform:'uppercase',margin:0}}>
+                        Pita<span style={{color:'var(--yellow)'}}>Electricidad</span>
+                      </h1>
+                      <p style={{fontFamily:'Barlow',fontSize:'10px',color:'var(--silver)',letterSpacing:'0.1em',textTransform:'uppercase',lineHeight:1.2,margin:0}}>Ferretería &amp; Electricidad</p>
+                    </div>
+                  </div>
+                  <div style={{display:'flex',alignItems:'center',gap:'2px'}}>
+                    <button onClick={()=>navigate('track_order')} style={{color:'var(--silver-light)',padding:'8px 10px',background:'transparent',border:'none',cursor:'pointer',fontFamily:'Barlow Condensed',fontWeight:600,fontSize:'13px',textTransform:'uppercase',letterSpacing:'0.05em',display:'flex',alignItems:'center',gap:'6px'}}>
+                      <i className="fa-solid fa-clipboard-list" style={{fontSize:'18px'}}></i>
+                    </button>
+                    <button onClick={()=>navigate('cart')} style={{position:'relative',color:cartItemCount>0?'var(--yellow)':'var(--silver-light)',padding:'8px',background:'transparent',border:'none',cursor:'pointer'}}>
+                      <i className="fa-solid fa-cart-shopping" style={{fontSize:'20px'}}></i>
+                      {cartItemCount > 0 && (
+                        <span className="cart-badge" style={{position:'absolute',top:'2px',right:'2px',background:'var(--rust)',color:'white',fontSize:'10px',fontWeight:800,fontFamily:'Barlow Condensed',borderRadius:'50%',width:'18px',height:'18px',display:'flex',alignItems:'center',justifyContent:'center'}}>{cartItemCount}</span>
+                      )}
+                    </button>
+                    <button onClick={()=>navigate('admin_login')} style={{color:'var(--silver)',padding:'8px',background:'transparent',border:'none',cursor:'pointer'}}>
+                      <i className="fa-solid fa-gear" style={{fontSize:'18px'}}></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        }
+
+        // ── HOME VIEW ────────────────────────────────────────────────────────
+        function HomeView({ products, categories, offers, searchTerm, setSearchTerm, navigate, setSelectedCategory, setSelectedProduct }) {
+          const displayedProducts = searchTerm
+            ? products.filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase()) || p.desc.toLowerCase().includes(searchTerm.toLowerCase()))
+            : [];
+
+          const handleSelectProduct = (p) => { setSelectedProduct(p); navigate('product'); };
+          const handleSelectCategory = (cat) => { setSelectedCategory(cat); navigate('category'); };
+
+          return (
+            <div style={{paddingBottom:'40px',maxWidth:'960px',margin:'0 auto'}} className="anim-in">
+              <div style={{background:'var(--steel)',padding:'16px'}}>
+                <div style={{position:'relative',maxWidth:'600px',margin:'0 auto'}}>
+                  <i className="fa-solid fa-magnifying-glass" style={{position:'absolute',left:'14px',top:'50%',transform:'translateY(-50%)',color:'var(--silver)',fontSize:'16px',pointerEvents:'none'}}></i>
+                  <input
+                    type="text"
+                    placeholder="Buscar productos, herramientas, materiales..."
+                    style={{width:'100%',background:'rgba(255,255,255,0.08)',border:'1.5px solid rgba(255,255,255,0.12)',borderRadius:'6px',padding:'12px 14px 12px 42px',color:'white',fontFamily:'Barlow',fontSize:'15px',outline:'none'}}
+                    value={searchTerm}
+                    onChange={e => setSearchTerm(e.target.value)}
+                    onFocus={e=>e.target.style.borderColor='var(--yellow)'}
+                    onBlur={e=>e.target.style.borderColor='rgba(255,255,255,0.12)'}
+                  />
+                </div>
+              </div>
+
+              {searchTerm ? (
+                <div style={{padding:'20px 16px'}} className="anim-in">
+                  <div className="section-header">
+                    <h2>Resultados</h2>
+                    <div className="section-line"></div>
+                    <span style={{fontFamily:'Barlow Condensed',fontWeight:700,color:'var(--silver)',fontSize:'14px',whiteSpace:'nowrap'}}>{displayedProducts.length} productos</span>
+                  </div>
+                  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(150px,1fr))',gap:'12px'}}>
+                    {displayedProducts.map(p => <ProductCard key={p.id} product={p} onSelect={handleSelectProduct}/>)}
+                    {displayedProducts.length === 0 && (
+                      <div style={{gridColumn:'1/-1',textAlign:'center',padding:'40px',color:'var(--silver)'}}>
+                        <i className="fa-solid fa-magnifying-glass" style={{fontSize:'32px',marginBottom:'12px',display:'block'}}></i>
+                        <p style={{fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'18px'}}>Sin resultados para "{searchTerm}"</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <React.Fragment>
+                  {offers.length > 0 && (
+                    <div style={{padding:'20px 16px'}}>
+                      <div className="section-header">
+                        <div style={{background:'var(--rust)',padding:'4px 10px',borderRadius:'4px'}}>
+                          <span style={{fontFamily:'Barlow Condensed',fontWeight:800,fontSize:'14px',color:'white',textTransform:'uppercase',letterSpacing:'0.08em'}}>Ofertas</span>
+                        </div>
+                        <h2>Destacadas</h2>
+                        <div className="section-line"></div>
+                      </div>
+                      <div className="offers-scroll">
+                        {offers.map(p => (
+                          <div key={p.id} style={{width:'160px'}}>
+                            <ProductCard product={p} onSelect={handleSelectProduct}/>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div style={{margin:'0 16px',height:'1px',background:'linear-gradient(to right,var(--yellow),transparent)',opacity:0.4}}></div>
+
+                  <div style={{padding:'20px 16px'}}>
+                    <div className="section-header"><h2>Categorías</h2><div className="section-line"></div></div>
+                    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(140px,1fr))',gap:'12px'}}>
+                      {[...categories].sort((a,b)=>a.order-b.order).map(cat => (
+                        <button key={cat.id} className="cat-card" onClick={()=>handleSelectCategory(cat)}
+                          style={{padding:'20px 12px',borderRadius:'8px',display:'flex',flexDirection:'column',alignItems:'center',gap:'10px',cursor:'pointer',textAlign:'center',width:'100%',border:'2px solid #e8e2d9',background:'var(--warm-white)'}}>
+                          <div style={{width:'44px',height:'44px',background:'var(--steel)',borderRadius:'6px',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                            <i className={`fa-solid ${catIcons[cat.id]||'fa-box'}`} style={{color:'var(--yellow)',fontSize:'18px'}}></i>
+                          </div>
+                          <span style={{fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'15px',textTransform:'uppercase',letterSpacing:'0.04em',color:'var(--steel)'}}>{cat.name}</span>
+                          <span style={{fontFamily:'Barlow',fontSize:'12px',color:'var(--silver)'}}>{products.filter(p=>p.categoryId===cat.id).length} productos</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div style={{padding:'0 16px 20px'}}>
+                    <div className="section-header"><h2>Todo el catálogo</h2><div className="section-line"></div></div>
+                    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(150px,1fr))',gap:'12px'}}>
+                      {products.map(p => <ProductCard key={p.id} product={p} onSelect={handleSelectProduct}/>)}
+                    </div>
+                  </div>
+                </React.Fragment>
+              )}
+            </div>
+          );
+        }
+
+        // ── CATEGORY VIEW ────────────────────────────────────────────────────
+        function CategoryView({ category, products, navigate, setSelectedProduct }) {
+          if (!category) return null;
+          const catProducts = products.filter(p => p.categoryId === category.id);
+          const handleSelectProduct = (p) => { setSelectedProduct(p); navigate('product'); };
+          return (
+            <div style={{maxWidth:'960px',margin:'0 auto',paddingBottom:'40px'}} className="anim-in">
+              <div style={{background:'var(--steel)',padding:'14px 16px',display:'flex',alignItems:'center',gap:'12px',borderBottom:'3px solid var(--yellow)'}}>
+                <button onClick={()=>navigate('home')} style={{color:'var(--silver)',background:'none',border:'none',cursor:'pointer',fontSize:'18px',padding:'4px'}}>
+                  <i className="fa-solid fa-chevron-left"></i>
+                </button>
+                <div style={{width:'32px',height:'32px',background:'var(--yellow)',borderRadius:'4px',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                  <i className={`fa-solid ${catIcons[category.id]||'fa-box'}`} style={{color:'var(--steel)',fontSize:'14px'}}></i>
+                </div>
+                <h2 style={{fontFamily:'Barlow Condensed',fontWeight:900,fontSize:'22px',color:'white',textTransform:'uppercase',letterSpacing:'0.04em',margin:0}}>{category.name}</h2>
+                <span style={{fontFamily:'Barlow',fontSize:'13px',color:'var(--silver)',marginLeft:'auto'}}>{catProducts.length} art.</span>
+              </div>
+              <div style={{padding:'20px 16px',display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(150px,1fr))',gap:'12px'}}>
+                {catProducts.map(p => <ProductCard key={p.id} product={p} onSelect={handleSelectProduct}/>)}
+                {catProducts.length===0 && <p style={{color:'var(--silver)',gridColumn:'1/-1',padding:'30px',textAlign:'center'}}>Sin productos en esta categoría.</p>}
+              </div>
+            </div>
+          );
+        }
+
+        // ── PRODUCT DETAIL ───────────────────────────────────────────────────
+        function ProductDetailView({ product, categories, addToCart, navigate }) {
+          const [qty, setQty] = useState(1);
+          if (!product) return null;
+          const price = getProductPrice(product);
+          const category = categories.find(c => c.id === product.categoryId);
+          const discount = product.isOffer ? Math.round((1-product.offerPrice/product.price)*100) : 0;
+          return (
+            <div style={{maxWidth:'680px',margin:'0 auto',background:'white',minHeight:'100vh',paddingBottom:'90px'}} className="anim-in">
+              <div style={{position:'absolute',top:'16px',left:'16px',zIndex:20}}>
+                <button onClick={()=>navigate('home')} style={{background:'rgba(26,31,46,0.8)',border:'none',color:'white',width:'36px',height:'36px',borderRadius:'50%',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',backdropFilter:'blur(4px)'}}>
+                  <i className="fa-solid fa-chevron-left"></i>
+                </button>
+              </div>
+              <div style={{aspectRatio:'1/1',background:'#f0ede8',overflow:'hidden',position:'relative'}}>
+                <img src={product.image} alt={product.name} style={{width:'100%',height:'100%',objectFit:'cover'}}/>
+                {product.isOffer && (
+                  <div style={{position:'absolute',top:'16px',right:'16px',background:'var(--rust)',color:'white',fontFamily:'Barlow Condensed',fontWeight:800,fontSize:'22px',padding:'6px 14px',boxShadow:'3px 3px 0 rgba(0,0,0,0.3)'}}>
+                    -{discount}% OFF
+                  </div>
+                )}
+              </div>
+              <div style={{padding:'20px'}}>
+                <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'6px'}}>
+                  <i className={`fa-solid ${catIcons[product.categoryId]||'fa-box'}`} style={{color:'var(--yellow)',fontSize:'13px'}}></i>
+                  <span style={{fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'13px',textTransform:'uppercase',letterSpacing:'0.08em',color:'var(--yellow)'}}>{category?.name}</span>
+                </div>
+                <h1 style={{fontFamily:'Barlow Condensed',fontWeight:900,fontSize:'30px',color:'var(--steel)',lineHeight:1.1,margin:'0 0 14px'}}>{product.name}</h1>
+                <div style={{display:'flex',alignItems:'baseline',gap:'10px',marginBottom:'16px'}}>
+                  <span style={{fontFamily:'Barlow Condensed',fontWeight:900,fontSize:'38px',color:product.isOffer?'var(--rust-light)':'var(--steel)'}}>{formatPrice(price)}</span>
+                  {product.isOffer && <span style={{fontFamily:'Barlow Condensed',fontSize:'20px',color:'#aaa',textDecoration:'line-through'}}>{formatPrice(product.price)}</span>}
+                </div>
+                <div style={{borderTop:'1px solid #e8e2d9',paddingTop:'14px'}}>
+                  <p style={{fontSize:'14px',fontWeight:600,color:'var(--steel)',marginBottom:'6px',textTransform:'uppercase',letterSpacing:'0.06em',fontFamily:'Barlow Condensed'}}>Descripción</p>
+                  <p style={{fontSize:'15px',color:'#6b7280',lineHeight:1.6}}>{product.desc}</p>
+                </div>
+              </div>
+              <div style={{position:'fixed',bottom:0,left:0,right:0,background:'white',borderTop:'3px solid var(--yellow)',padding:'12px 16px',display:'flex',gap:'12px',alignItems:'center',zIndex:50,boxShadow:'0 -4px 16px rgba(0,0,0,0.1)'}}>
+                {product.hasStock ? (
+                  <React.Fragment>
+                    <div style={{display:'flex',alignItems:'center',border:'2px solid var(--steel)',borderRadius:'6px',overflow:'hidden',height:'48px'}}>
+                      <button onClick={()=>setQty(Math.max(1,qty-1))} style={{width:'40px',height:'100%',border:'none',background:'var(--offwhite)',color:'var(--steel)',cursor:'pointer',fontSize:'18px'}}>−</button>
+                      <span style={{width:'36px',textAlign:'center',fontFamily:'Barlow Condensed',fontWeight:800,fontSize:'20px',color:'var(--steel)'}}>{qty}</span>
+                      <button onClick={()=>setQty(qty+1)} style={{width:'40px',height:'100%',border:'none',background:'var(--offwhite)',color:'var(--steel)',cursor:'pointer',fontSize:'18px'}}>+</button>
+                    </div>
+                    <button onClick={()=>{ addToCart(product,qty); navigate('cart'); }} className="btn-primary"
+                      style={{flex:1,height:'48px',display:'flex',alignItems:'center',justifyContent:'center',gap:'8px',fontSize:'17px'}}>
+                      <i className="fa-solid fa-cart-shopping"></i> Agregar
+                    </button>
+                  </React.Fragment>
+                ) : (
+                  <button disabled style={{width:'100%',height:'48px',background:'#e5e7eb',color:'#9ca3af',fontFamily:'Barlow Condensed',fontWeight:800,fontSize:'17px',textTransform:'uppercase',border:'none',borderRadius:'6px',cursor:'not-allowed'}}>Sin Stock</button>
+                )}
+              </div>
+            </div>
+          );
+        }
+
+        // ── CART VIEW ────────────────────────────────────────────────────────
+        function CartView({ cart, cartTotal, updateCartQty, removeFromCart, navigate }) {
+          return (
+            <div style={{maxWidth:'640px',margin:'0 auto',background:'#f8f5f0',minHeight:'100vh',paddingBottom:'40px'}} className="anim-in">
+              <div style={{background:'var(--steel)',padding:'14px 16px',display:'flex',alignItems:'center',gap:'12px',borderBottom:'3px solid var(--yellow)',position:'sticky',top:0,zIndex:40}}>
+                <button onClick={()=>navigate('home')} style={{background:'none',border:'none',color:'var(--silver)',cursor:'pointer',fontSize:'18px'}}><i className="fa-solid fa-chevron-left"></i></button>
+                <h2 style={{fontFamily:'Barlow Condensed',fontWeight:900,fontSize:'24px',color:'white',textTransform:'uppercase',letterSpacing:'0.04em',margin:0}}>Carrito</h2>
+                {cart.length>0 && <span style={{marginLeft:'auto',background:'var(--yellow)',color:'var(--steel)',fontFamily:'Barlow Condensed',fontWeight:800,fontSize:'14px',padding:'2px 10px',borderRadius:'20px'}}>{cart.reduce((a,i)=>a+i.quantity,0)} art.</span>}
+              </div>
+              {cart.length===0 ? (
+                <div style={{textAlign:'center',padding:'60px 20px'}}>
+                  <i className="fa-solid fa-cart-shopping" style={{fontSize:'52px',color:'#d1ccc4',display:'block',marginBottom:'16px'}}></i>
+                  <p style={{fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'22px',color:'var(--iron)'}}>Tu carrito está vacío</p>
+                  <p style={{color:'var(--silver)',marginBottom:'24px'}}>Agregá productos desde el catálogo</p>
+                  <button onClick={()=>navigate('home')} className="btn-dark" style={{padding:'12px 28px',fontSize:'15px'}}>Ver catálogo</button>
+                </div>
+              ) : (
+                <div style={{padding:'16px'}}>
+                  <div style={{display:'flex',flexDirection:'column',gap:'10px'}}>
+                    {cart.map(item => (
+                      <div key={item.product.id} style={{background:'white',borderRadius:'8px',border:'1.5px solid #e8e2d9',display:'flex',gap:'12px',padding:'12px',alignItems:'flex-start'}}>
+                        <img src={item.product.image} alt={item.product.name} style={{width:'64px',height:'64px',objectFit:'cover',borderRadius:'6px',border:'1px solid #e8e2d9',flexShrink:0}}/>
+                        <div style={{flex:1}}>
+                          <p style={{fontWeight:600,fontSize:'14px',color:'var(--steel)',lineHeight:1.3,marginBottom:'4px'}}>{item.product.name}</p>
+                          <p style={{fontFamily:'Barlow Condensed',fontWeight:800,fontSize:'17px',color:'var(--yellow-hot)',marginBottom:'8px'}}>{formatPrice(item.price)}</p>
+                          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+                            <div style={{display:'flex',alignItems:'center',border:'1.5px solid #e8e2d9',borderRadius:'6px',overflow:'hidden'}}>
+                              <button onClick={()=>updateCartQty(item.product.id,-1)} style={{width:'32px',height:'30px',border:'none',background:'#f0ede8',color:'var(--steel)',cursor:'pointer',fontSize:'14px'}}>−</button>
+                              <span style={{width:'28px',textAlign:'center',fontFamily:'Barlow Condensed',fontWeight:800,fontSize:'16px'}}>{item.quantity}</span>
+                              <button onClick={()=>updateCartQty(item.product.id,1)} style={{width:'32px',height:'30px',border:'none',background:'#f0ede8',color:'var(--steel)',cursor:'pointer',fontSize:'14px'}}>+</button>
+                            </div>
+                            <button onClick={()=>removeFromCart(item.product.id)} style={{background:'none',border:'none',color:'#ef4444',cursor:'pointer',padding:'4px',fontSize:'15px'}}><i className="fa-solid fa-trash"></i></button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{background:'var(--steel)',borderRadius:'8px',padding:'16px 20px',marginTop:'20px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                    <span style={{fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'16px',color:'var(--silver-light)',textTransform:'uppercase',letterSpacing:'0.06em'}}>Total estimado</span>
+                    <span style={{fontFamily:'Barlow Condensed',fontWeight:900,fontSize:'28px',color:'var(--yellow)'}}>{formatPrice(cartTotal)}</span>
+                  </div>
+                  <button onClick={()=>navigate('checkout')} className="btn-primary" style={{width:'100%',height:'52px',marginTop:'16px',display:'flex',alignItems:'center',justifyContent:'center',gap:'8px',fontSize:'19px'}}>
+                    <i className="fa-solid fa-arrow-right"></i> Confirmar pedido
+                  </button>
+                </div>
+              )}
+            </div>
+          );
+        }
+
+        // ── CHECKOUT VIEW ────────────────────────────────────────────────────
+        function CheckoutView({ cartTotal, placeOrder, navigate }) {
+          const [formData, setFormData] = useState({ name:'', phone:'', deliveryType:'retiro', address:'', observations:'' });
+          const upd = (k,v) => setFormData(prev => ({...prev,[k]:v}));
+          const handleSubmit = (e) => { e.preventDefault(); placeOrder(formData); };
+          return (
+            <div style={{maxWidth:'520px',margin:'0 auto',background:'white',minHeight:'100vh',paddingBottom:'30px'}} className="anim-in">
+              <div style={{background:'var(--steel)',padding:'14px 16px',display:'flex',alignItems:'center',gap:'12px',borderBottom:'3px solid var(--yellow)',position:'sticky',top:0,zIndex:40}}>
+                <button onClick={()=>navigate('cart')} style={{background:'none',border:'none',color:'var(--silver)',cursor:'pointer',fontSize:'18px'}}><i className="fa-solid fa-chevron-left"></i></button>
+                <h2 style={{fontFamily:'Barlow Condensed',fontWeight:900,fontSize:'24px',color:'white',textTransform:'uppercase',letterSpacing:'0.04em',margin:0}}>Confirmar pedido</h2>
+              </div>
+              <form onSubmit={handleSubmit} style={{padding:'20px',display:'flex',flexDirection:'column',gap:'18px'}}>
+                <div>
+                  <label style={{display:'block',fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'14px',textTransform:'uppercase',letterSpacing:'0.08em',color:'var(--iron)',marginBottom:'6px'}}>Nombre y Apellido</label>
+                  <input required type="text" className="input-field" value={formData.name} onChange={e=>upd('name',e.target.value)}/>
+                </div>
+                <div>
+                  <label style={{display:'block',fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'14px',textTransform:'uppercase',letterSpacing:'0.08em',color:'var(--iron)',marginBottom:'6px'}}>Teléfono (WhatsApp)</label>
+                  <input required type="tel" className="input-field" value={formData.phone} onChange={e=>upd('phone',e.target.value)}/>
+                </div>
+                <div>
+                  <label style={{display:'block',fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'14px',textTransform:'uppercase',letterSpacing:'0.08em',color:'var(--iron)',marginBottom:'10px'}}>Tipo de entrega</label>
+                  <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'10px'}}>
+                    {[['retiro','fa-box','Retiro en local'],['envio','fa-truck','Envío a domicilio']].map(([val,icon,label])=>(
+                      <label key={val} style={{border:`2px solid ${formData.deliveryType===val?'var(--yellow)':'#ddd7ce'}`,background:formData.deliveryType===val?'#fefbf3':'white',borderRadius:'8px',padding:'14px 12px',cursor:'pointer',display:'flex',alignItems:'center',gap:'10px',transition:'all 0.15s'}}>
+                        <input type="radio" name="delivery" style={{display:'none'}} checked={formData.deliveryType===val} onChange={()=>upd('deliveryType',val)}/>
+                        <i className={`fa-solid ${icon}`} style={{color:formData.deliveryType===val?'var(--yellow)':'var(--silver)',fontSize:'18px'}}></i>
+                        <span style={{fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'15px',color:formData.deliveryType===val?'var(--steel)':'var(--iron)'}}>{label}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+                {formData.deliveryType==='envio' && (
+                  <div className="anim-in">
+                    <label style={{display:'block',fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'14px',textTransform:'uppercase',letterSpacing:'0.08em',color:'var(--iron)',marginBottom:'6px'}}>Dirección de Envío</label>
+                    <input required type="text" className="input-field" placeholder="Ej: Av. Constitución 1234, Del Viso" value={formData.address} onChange={e=>upd('address',e.target.value)}/>
+                  </div>
+                )}
+                <div>
+                  <label style={{display:'block',fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'14px',textTransform:'uppercase',letterSpacing:'0.08em',color:'var(--iron)',marginBottom:'6px'}}>
+                    Observaciones <span style={{fontWeight:400,textTransform:'none',fontSize:'12px',color:'var(--silver)'}}>(opcional)</span>
+                  </label>
+                  <textarea className="input-field" style={{minHeight:'80px',resize:'vertical'}} placeholder="Ej: Pasar martes a la tarde" value={formData.observations} onChange={e=>upd('observations',e.target.value)}></textarea>
+                </div>
+                <div style={{background:'var(--steel)',borderRadius:'8px',padding:'16px 20px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                  <div>
+                    <span style={{fontFamily:'Barlow Condensed',fontWeight:600,fontSize:'13px',color:'var(--silver)',textTransform:'uppercase',letterSpacing:'0.06em',display:'block'}}>Total a pagar</span>
+                    <span style={{fontFamily:'Barlow Condensed',fontWeight:900,fontSize:'30px',color:'var(--yellow)'}}>{formatPrice(cartTotal)}</span>
+                  </div>
+                  <div style={{display:'flex',gap:'4px',alignItems:'center'}}>
+                    {[0,1,2].map(i=><div key={i} className="rivet"></div>)}
+                  </div>
+                </div>
+                <button type="submit" style={{background:'#16a34a',color:'white',fontFamily:'Barlow Condensed',fontWeight:800,fontSize:'19px',letterSpacing:'0.03em',textTransform:'uppercase',border:'none',borderRadius:'8px',height:'52px',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:'10px',boxShadow:'0 4px 14px rgba(22,163,74,0.35)'}}>
+                  <i className="fa-solid fa-circle-check"></i> Confirmar pedido
+                </button>
+              </form>
+            </div>
+          );
+        }
+
+        // ── SUCCESS VIEW ─────────────────────────────────────────────────────
+        function SuccessView({ lastOrder, navigate }) {
+          return (
+            <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',minHeight:'100vh',padding:'30px 20px',textAlign:'center',background:'var(--steel)'}} className="anim-in">
+              <div style={{width:'80px',height:'80px',background:'var(--yellow)',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:'20px',boxShadow:'0 0 0 12px rgba(245,166,35,0.2)'}}>
+                <i className="fa-solid fa-circle-check" style={{fontSize:'36px',color:'var(--steel)'}}></i>
+              </div>
+              <h2 style={{fontFamily:'Barlow Condensed',fontWeight:900,fontSize:'36px',color:'white',textTransform:'uppercase',letterSpacing:'0.04em',margin:'0 0 8px'}}>¡Pedido confirmado!</h2>
+              <p style={{color:'var(--silver-light)',marginBottom:'28px',fontSize:'15px'}}>Ya recibimos tu pedido. Te contactamos pronto.</p>
+              <div style={{background:'rgba(255,255,255,0.06)',border:'1.5px solid rgba(255,255,255,0.12)',borderRadius:'10px',padding:'24px',width:'100%',maxWidth:'320px',marginBottom:'24px'}}>
+                <p style={{fontFamily:'Barlow',fontSize:'12px',color:'var(--silver)',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'8px'}}>Tu número de pedido</p>
+                <p style={{fontFamily:'Barlow Condensed',fontWeight:900,fontSize:'36px',color:'var(--yellow)',letterSpacing:'0.08em',marginBottom:'12px'}}>{lastOrder?.id}</p>
+                <div style={{background:'rgba(245,166,35,0.1)',border:'1px solid rgba(245,166,35,0.3)',borderRadius:'6px',padding:'10px 12px'}}>
+                  <p style={{fontFamily:'Barlow',fontSize:'13px',color:'var(--silver-light)',lineHeight:1.5}}>
+                    Guardá este número. Usalo en <strong style={{color:'var(--yellow)'}}>Seguimiento</strong> para ver el estado de tu pedido.
+                  </p>
+                </div>
+              </div>
+              <button onClick={()=>navigate('home')} className="btn-primary" style={{width:'100%',maxWidth:'320px',height:'50px',display:'flex',alignItems:'center',justifyContent:'center',gap:'8px',fontSize:'17px'}}>
+                <i className="fa-solid fa-house"></i> Volver al catálogo
+              </button>
+            </div>
+          );
+        }
+
+        // ── TRACK ORDER VIEW ─────────────────────────────────────────────────
+        function TrackOrderView({ orders, navigate, trackSearchId, setTrackSearchId, trackedOrder, setTrackedOrder }) {
+          const getStepInfo = (status, deliveryType) => {
+            if (status==='Cancelado') return { index:-1, isError:true };
+            const steps = [
+              { name:'Nuevo', label:'Recibido' },
+              { name:'En preparación', label:'Armando' },
+              { name:'Preparado', label:'Listo' },
+              { name: deliveryType==='envio'?'Enviado':'Entregado', label: deliveryType==='envio'?'En camino':'Entregado' }
+            ];
+            const idx = steps.findIndex(s=>s.name===status);
+            return { index: idx!==-1?idx:0, steps, isError:false };
+          };
+          const handleSearch = (e) => {
+            e.preventDefault();
+            if (!trackSearchId.trim()) return;
+            let q = trackSearchId.trim().toUpperCase();
+            if (/^\d+$/.test(q)) q = `PED-${q}`;
+            const found = orders.find(o=>o.id===q);
+            setTrackedOrder(found||'not_found');
+          };
+          return (
+            <div style={{maxWidth:'520px',margin:'0 auto',minHeight:'100vh',background:'#f8f5f0',paddingBottom:'30px'}} className="anim-in">
+              <div style={{background:'var(--steel)',padding:'14px 16px',display:'flex',alignItems:'center',gap:'12px',borderBottom:'3px solid var(--yellow)',position:'sticky',top:0,zIndex:40}}>
+                <button onClick={()=>navigate('home')} style={{background:'none',border:'none',color:'var(--silver)',cursor:'pointer',fontSize:'18px'}}><i className="fa-solid fa-chevron-left"></i></button>
+                <h2 style={{fontFamily:'Barlow Condensed',fontWeight:900,fontSize:'24px',color:'white',textTransform:'uppercase',letterSpacing:'0.04em',margin:0}}>Seguimiento</h2>
+              </div>
+              <div style={{padding:'20px 16px'}}>
+                <div style={{background:'white',borderRadius:'8px',border:'1.5px solid #e8e2d9',padding:'20px',marginBottom:'20px'}}>
+                  <p style={{fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'13px',color:'var(--iron)',textTransform:'uppercase',letterSpacing:'0.08em',marginBottom:'10px'}}>
+                    <i className="fa-solid fa-file-code" style={{color:'var(--yellow)',marginRight:'6px'}}></i>Buscá tu pedido
+                  </p>
+                  <form onSubmit={handleSearch} style={{display:'flex',gap:'8px'}}>
+                    <input type="text" placeholder="Ej: PED-4743 ó 4743"
+                      style={{flex:1,background:'var(--offwhite)',border:'2px solid #ddd7ce',borderRadius:'6px',padding:'10px 14px',fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'16px',letterSpacing:'0.05em',textTransform:'uppercase',color:'var(--steel)',outline:'none'}}
+                      value={trackSearchId} onChange={e=>setTrackSearchId(e.target.value)}
+                      onFocus={e=>e.target.style.borderColor='var(--yellow)'}
+                      onBlur={e=>e.target.style.borderColor='#ddd7ce'}/>
+                    <button type="submit" className="btn-dark" style={{padding:'10px 20px',fontSize:'15px'}}>Buscar</button>
+                  </form>
+                </div>
+                {trackedOrder==='not_found' && (
+                  <div style={{background:'white',borderRadius:'8px',border:'1.5px solid #e8e2d9',padding:'32px',textAlign:'center'}} className="anim-in">
+                    <i className="fa-solid fa-circle-exclamation" style={{fontSize:'36px',color:'#d1ccc4',display:'block',marginBottom:'12px'}}></i>
+                    <p style={{fontFamily:'Barlow Condensed',fontWeight:800,fontSize:'20px',color:'var(--steel)'}}>Pedido no encontrado</p>
+                    <p style={{color:'var(--silver)',fontSize:'14px',marginTop:'4px'}}>Revisá el número e intentá de nuevo.</p>
+                  </div>
+                )}
+                {trackedOrder && trackedOrder!=='not_found' && (() => {
+                  const { index, steps, isError } = getStepInfo(trackedOrder.status, trackedOrder.deliveryType);
+                  return (
+                    <div style={{background:'white',borderRadius:'8px',border:'1.5px solid #e8e2d9',overflow:'hidden'}} className="anim-in">
+                      <div style={{background:'var(--steel)',padding:'16px 20px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                        <div>
+                          <p style={{fontFamily:'Barlow Condensed',fontWeight:900,fontSize:'26px',color:'var(--yellow)',letterSpacing:'0.06em',margin:0}}>{trackedOrder.id}</p>
+                          <p style={{fontFamily:'Barlow',fontSize:'12px',color:'var(--silver)',margin:'2px 0 0'}}>{new Date(trackedOrder.date).toLocaleString('es-AR')}</p>
+                        </div>
+                        <span style={{background:'rgba(255,255,255,0.08)',border:'1px solid rgba(255,255,255,0.15)',color:'var(--silver-light)',fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'12px',textTransform:'uppercase',letterSpacing:'0.07em',padding:'4px 10px',borderRadius:'20px'}}>{trackedOrder.deliveryType}</span>
+                      </div>
+                      <div style={{padding:'24px 20px',background:'var(--offwhite)',borderBottom:'1px solid #e8e2d9'}}>
+                        {isError ? (
+                          <div style={{textAlign:'center',background:'#fee2e2',borderRadius:'6px',padding:'14px',color:'#991b1b',fontFamily:'Barlow Condensed',fontWeight:800,fontSize:'18px',display:'flex',alignItems:'center',justifyContent:'center',gap:'8px'}}>
+                            <i className="fa-solid fa-circle-exclamation"></i> Este pedido fue cancelado
+                          </div>
+                        ) : (
+                          <div style={{position:'relative',paddingTop:'8px'}}>
+                            <div style={{position:'absolute',top:'18px',left:'12%',right:'12%',height:'3px',background:'#e8e2d9',borderRadius:'2px'}}></div>
+                            <div style={{position:'absolute',top:'18px',left:'12%',height:'3px',background:'var(--yellow)',borderRadius:'2px',width:`${(index/3)*76}%`,transition:'width 0.6s ease'}}></div>
+                            <div style={{display:'flex',justifyContent:'space-between',position:'relative'}}>
+                              {steps.map((step,i)=>{
+                                const done = i<=index, active = i===index;
+                                return (
+                                  <div key={i} style={{display:'flex',flexDirection:'column',alignItems:'center',width:'25%'}}>
+                                    <div style={{width:'28px',height:'28px',borderRadius:'50%',background:done?'var(--yellow)':'#ddd7ce',display:'flex',alignItems:'center',justifyContent:'center',zIndex:1,boxShadow:active?'0 0 0 4px rgba(245,166,35,0.3)':'none',transition:'all 0.3s'}}>
+                                      {done?<i className="fa-solid fa-check" style={{fontSize:'12px',color:'var(--steel)'}}></i>:<span style={{fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'12px',color:'var(--silver)'}}>{i+1}</span>}
+                                    </div>
+                                    <span style={{fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'11px',textTransform:'uppercase',letterSpacing:'0.04em',color:active?'var(--steel)':done?'var(--iron)':'#aaa',marginTop:'6px',textAlign:'center'}}>{step.label}</span>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      <div style={{padding:'16px 20px'}}>
+                        <p style={{fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'14px',textTransform:'uppercase',letterSpacing:'0.07em',color:'var(--iron)',marginBottom:'10px'}}>Resumen</p>
+                        {trackedOrder.items.map((item,i)=>(
+                          <div key={i} style={{display:'flex',justifyContent:'space-between',fontSize:'14px',color:'var(--steel)',padding:'4px 0',borderBottom:'1px dashed #e8e2d9'}}>
+                            <span><strong>x{item.quantity}</strong> {item.name}</span>
+                          </div>
+                        ))}
+                        <div style={{display:'flex',justifyContent:'space-between',marginTop:'12px',paddingTop:'10px',borderTop:'2px solid var(--steel)'}}>
+                          <span style={{fontFamily:'Barlow Condensed',fontWeight:800,fontSize:'16px',textTransform:'uppercase',color:'var(--steel)'}}>Total</span>
+                          <span style={{fontFamily:'Barlow Condensed',fontWeight:900,fontSize:'20px',color:'var(--steel)'}}>{formatPrice(trackedOrder.total)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+            </div>
+          );
+        }
+
+        // ── ADMIN LOGIN ──────────────────────────────────────────────────────
+        function AdminLogin({ navigate, setIsAdmin }) {
+          const [pin, setPin] = useState('');
+          const handleLogin = (e) => {
+            e.preventDefault();
+            if (pin==='1234') { setIsAdmin(true); navigate('admin_orders'); }
+            else alert('PIN incorrecto. (Usá 1234 para probar)');
+          };
+          return (
+            <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',minHeight:'100vh',padding:'30px',background:'var(--steel)',textAlign:'center'}}>
+              <div className="hazard-stripe" style={{width:'100%',height:'5px',marginBottom:'40px'}}></div>
+              <div style={{width:'64px',height:'64px',background:'var(--yellow)',borderRadius:'8px',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:'20px',boxShadow:'0 8px 24px rgba(245,166,35,0.4)'}}>
+                <i className="fa-solid fa-bolt" style={{fontSize:'28px',color:'var(--steel)'}}></i>
+              </div>
+              <h2 style={{fontFamily:'Barlow Condensed',fontWeight:900,fontSize:'32px',color:'white',textTransform:'uppercase',letterSpacing:'0.04em',marginBottom:'6px'}}>Acceso al Depósito</h2>
+              <p style={{color:'var(--silver)',marginBottom:'30px',fontSize:'14px'}}>Panel de administración</p>
+              <form onSubmit={handleLogin} style={{width:'100%',maxWidth:'300px',display:'flex',flexDirection:'column',gap:'12px'}}>
+                <input type="password" placeholder="PIN"
+                  style={{width:'100%',background:'rgba(255,255,255,0.07)',border:'2px solid rgba(255,255,255,0.12)',borderRadius:'8px',padding:'16px',textAlign:'center',fontSize:'28px',letterSpacing:'0.6em',color:'white',outline:'none',fontFamily:'Barlow Condensed'}}
+                  value={pin} onChange={e=>setPin(e.target.value)}
+                  onFocus={e=>e.target.style.borderColor='var(--yellow)'}
+                  onBlur={e=>e.target.style.borderColor='rgba(255,255,255,0.12)'}/>
+                <button type="submit" className="btn-primary" style={{width:'100%',height:'50px',fontSize:'17px'}}>Ingresar</button>
+              </form>
+              <button onClick={()=>navigate('home')} style={{color:'var(--silver)',background:'none',border:'none',cursor:'pointer',marginTop:'20px',fontFamily:'Barlow',fontSize:'14px'}}>← Volver a la tienda</button>
+            </div>
+          );
+        }
+
+        // ── ADMIN SIDEBAR ────────────────────────────────────────────────────
+        function AdminSidebar({ current, navigate, logout }) {
+          return (
+            <div className="metal-bg print:hidden" style={{width:'220px',minHeight:'100vh',padding:'16px 12px',position:'fixed',top:0,left:0,zIndex:30,display:'flex',flexDirection:'column',gap:'2px',borderRight:'3px solid var(--yellow)'}}>
+              <div style={{display:'flex',alignItems:'center',gap:'8px',padding:'10px 10px 20px',marginBottom:'4px'}}>
+                <div style={{width:'28px',height:'28px',background:'var(--yellow)',borderRadius:'4px',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                  <i className="fa-solid fa-bolt" style={{color:'var(--steel)',fontSize:'13px'}}></i>
+                </div>
+                <span style={{fontFamily:'Barlow Condensed',fontWeight:900,fontSize:'18px',color:'white',textTransform:'uppercase',letterSpacing:'0.04em'}}>Depósito</span>
+              </div>
+              <button onClick={()=>navigate('admin_orders')} className={`admin-nav-item ${current==='orders'?'active':''}`}><i className="fa-solid fa-box"></i> Pedidos</button>
+              <button onClick={()=>navigate('admin_products')} className={`admin-nav-item ${current==='products'?'active':''}`}><i className="fa-solid fa-boxes-stacked"></i> Productos</button>
+              <button className="admin-nav-item" style={{opacity:0.3,cursor:'not-allowed'}}><i className="fa-solid fa-tags"></i> Categorías</button>
+              <div style={{flex:1}}></div>
+              <button onClick={()=>navigate('home')} className="admin-nav-item" style={{opacity:0.6}}><i className="fa-solid fa-store"></i> Ver tienda</button>
+              <button onClick={logout} className="admin-nav-item" style={{color:'#fca5a5'}}><i className="fa-solid fa-right-from-bracket"></i> Salir</button>
+            </div>
+          );
+        }
+
+        function AdminMobileNav({ navigate, logout }) {
+          return (
+            <div className="metal-bg print:hidden" style={{padding:'12px 16px',display:'flex',justifyContent:'space-between',alignItems:'center',borderBottom:'3px solid var(--yellow)',position:'sticky',top:0,zIndex:40}}>
+              <span style={{fontFamily:'Barlow Condensed',fontWeight:900,fontSize:'18px',color:'white',textTransform:'uppercase',letterSpacing:'0.04em',display:'flex',alignItems:'center',gap:'8px'}}>
+                <i className="fa-solid fa-bolt" style={{color:'var(--yellow)'}}></i> Depósito
+              </span>
+              <div style={{display:'flex',gap:'6px',alignItems:'center'}}>
+                <button onClick={()=>navigate('admin_orders')} style={{background:'none',border:'none',color:'var(--silver-light)',cursor:'pointer',padding:'6px',fontSize:'18px'}}><i className="fa-solid fa-box"></i></button>
+                <button onClick={()=>navigate('admin_products')} style={{background:'none',border:'none',color:'var(--silver-light)',cursor:'pointer',padding:'6px',fontSize:'18px'}}><i className="fa-solid fa-boxes-stacked"></i></button>
+                <button onClick={logout} style={{background:'none',border:'none',color:'#fca5a5',cursor:'pointer',padding:'6px',fontSize:'18px',marginLeft:'6px'}}><i className="fa-solid fa-right-from-bracket"></i></button>
+              </div>
+            </div>
+          );
+        }
+
+        // ── ADMIN ORDERS ─────────────────────────────────────────────────────
+        function AdminOrdersView({ orders, navigate, logout }) {
+          const [filterStatus, setFilterStatus] = useState('Todos');
+          const filtered = filterStatus==='Todos' ? orders : orders.filter(o=>o.status===filterStatus);
+          return (
+            <div style={{minHeight:'100vh',background:'#f0ede8'}} className="print:hidden">
+              <div className="hidden md:block"><AdminSidebar current="orders" navigate={navigate} logout={logout}/></div>
+              <div className="md:hidden"><AdminMobileNav navigate={navigate} logout={logout}/></div>
+              <div className="md:ml-56" style={{padding:'24px 20px',maxWidth:'860px'}}>
+                <div style={{marginBottom:'20px',display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',gap:'10px'}}>
+                  <h2 style={{fontFamily:'Barlow Condensed',fontWeight:900,fontSize:'28px',color:'var(--steel)',textTransform:'uppercase',letterSpacing:'0.04em',margin:0}}>Gestión de Pedidos</h2>
+                  <span style={{fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'14px',color:'var(--silver)',textTransform:'uppercase',letterSpacing:'0.06em'}}>{orders.length} total</span>
+                </div>
+                <div style={{display:'flex',gap:'8px',overflowX:'auto',paddingBottom:'12px',marginBottom:'16px'}}>
+                  {['Todos','Nuevo','En preparación','Preparado','Entregado'].map(st=>(
+                    <button key={st} onClick={()=>setFilterStatus(st)}
+                      style={{background:filterStatus===st?'var(--steel)':'white',color:filterStatus===st?'white':'var(--iron)',border:`1.5px solid ${filterStatus===st?'var(--steel)':'#ddd7ce'}`,borderRadius:'6px',padding:'6px 14px',fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'14px',textTransform:'uppercase',letterSpacing:'0.04em',cursor:'pointer',whiteSpace:'nowrap',transition:'all 0.15s'}}
+                    >{st}</button>
+                  ))}
+                </div>
+                <div style={{background:'white',borderRadius:'8px',border:'1.5px solid #e8e2d9',overflow:'hidden'}}>
+                  {filtered.length===0 ? (
+                    <div style={{padding:'48px',textAlign:'center',color:'var(--silver)'}}>
+                      <i className="fa-solid fa-box-open" style={{fontSize:'40px',marginBottom:'12px',display:'block'}}></i>
+                      <p style={{fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'20px'}}>No hay pedidos</p>
+                    </div>
+                  ) : filtered.map(order=>(
+                    <div key={order.id} onClick={()=>navigate('admin_order_detail', order)}
+                      style={{padding:'14px 16px',display:'flex',alignItems:'center',gap:'12px',cursor:'pointer',borderBottom:'1px solid #f0ede8',background:'white',transition:'background 0.12s'}}
+                      onMouseEnter={e=>e.currentTarget.style.background='#faf8f5'}
+                      onMouseLeave={e=>e.currentTarget.style.background='white'}>
+                      <div style={{width:'40px',height:'40px',background:'var(--offwhite)',border:'1.5px solid #e8e2d9',borderRadius:'6px',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                        <i className="fa-solid fa-box" style={{color:'var(--yellow)',fontSize:'16px'}}></i>
+                      </div>
+                      <div style={{flex:1,minWidth:0}}>
+                        <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'3px',flexWrap:'wrap'}}>
+                          <span style={{fontFamily:'Barlow Condensed',fontWeight:800,fontSize:'18px',color:'var(--steel)'}}>{order.id}</span>
+                          <StatusBadge status={order.status}/>
+                        </div>
+                        <div style={{fontSize:'13px',color:'var(--silver)',display:'flex',gap:'12px',flexWrap:'wrap'}}>
+                          <span><i className="fa-solid fa-user" style={{marginRight:'4px'}}></i>{order.customerName}</span>
+                          <span style={{textTransform:'uppercase',fontWeight:600}}>{order.deliveryType}</span>
+                        </div>
+                      </div>
+                      <div style={{textAlign:'right',flexShrink:0}}>
+                        <div style={{fontFamily:'Barlow Condensed',fontWeight:900,fontSize:'18px',color:'var(--steel)'}}>{formatPrice(order.total)}</div>
+                        <div style={{fontSize:'11px',color:'var(--silver)'}}>{new Date(order.date).toLocaleDateString('es-AR')}</div>
+                      </div>
+                      <i className="fa-solid fa-chevron-right" style={{color:'#ddd7ce',fontSize:'13px'}}></i>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          );
+        }
+
+        // ── ADMIN ORDER DETAIL ───────────────────────────────────────────────
+        function AdminOrderDetailView({ order, orders, setOrders, setSelectedOrder, navigate, logout }) {
+          if (!order) return null;
+          const updateStatus = (newStatus) => {
+            setOrders(orders.map(o=>o.id===order.id?{...o,status:newStatus}:o));
+            setSelectedOrder({...order,status:newStatus});
+          };
+          return (
+            <div style={{minHeight:'100vh',background:'#f0ede8'}} className="anim-in">
+              <div className="hidden md:block print:hidden"><AdminSidebar current="orders" navigate={navigate} logout={logout}/></div>
+              <div className="md:hidden print:hidden"><AdminMobileNav navigate={navigate} logout={logout}/></div>
+              <div className="md:ml-56 print:ml-0" style={{padding:'20px'}}>
+                <button onClick={()=>navigate('admin_orders')} className="print:hidden" style={{display:'flex',alignItems:'center',gap:'6px',fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'15px',textTransform:'uppercase',color:'var(--iron)',background:'none',border:'none',cursor:'pointer',marginBottom:'16px',letterSpacing:'0.04em'}}>
+                  <i className="fa-solid fa-chevron-left"></i> Volver a pedidos
+                </button>
+                <div style={{display:'grid',gridTemplateColumns:'1fr',gap:'16px',maxWidth:'860px'}} className="md:grid-cols-2">
+                  <div style={{background:'white',borderRadius:'8px',border:'1.5px solid #e8e2d9',overflow:'hidden'}}>
+                    <div style={{background:'var(--steel)',padding:'14px 18px',display:'flex',justifyContent:'space-between',alignItems:'center',gap:'10px'}}>
+                      <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+                        <span style={{fontFamily:'Barlow Condensed',fontWeight:900,fontSize:'24px',color:'var(--yellow)',letterSpacing:'0.06em'}}>{order.id}</span>
+                        <StatusBadge status={order.status}/>
+                      </div>
+                      <span style={{fontFamily:'Barlow',fontSize:'12px',color:'var(--silver)'}}>{new Date(order.date).toLocaleString('es-AR')}</span>
+                    </div>
+                    <div style={{padding:'16px 18px'}}>
+                      {order.items.map((item,i)=>(
+                        <div key={i} style={{display:'flex',justifyContent:'space-between',padding:'8px 0',borderBottom:'1px dashed #e8e2d9',fontSize:'14px'}}>
+                          <span><strong style={{fontFamily:'Barlow Condensed',fontWeight:800,fontSize:'16px'}}>x{item.quantity}</strong> {item.name}</span>
+                          <span style={{fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'16px',color:'var(--steel)'}}>{formatPrice(item.subtotal)}</span>
+                        </div>
+                      ))}
+                      <div style={{display:'flex',justifyContent:'space-between',marginTop:'12px',paddingTop:'10px',borderTop:'2px solid var(--steel)'}}>
+                        <span style={{fontFamily:'Barlow Condensed',fontWeight:900,fontSize:'18px',textTransform:'uppercase',color:'var(--steel)'}}>Total</span>
+                        <span style={{fontFamily:'Barlow Condensed',fontWeight:900,fontSize:'22px',color:'var(--steel)'}}>{formatPrice(order.total)}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{display:'flex',flexDirection:'column',gap:'14px'}}>
+                    <div style={{background:'white',borderRadius:'8px',border:'1.5px solid #e8e2d9',padding:'16px 18px'}}>
+                      <p style={{fontFamily:'Barlow Condensed',fontWeight:800,fontSize:'14px',textTransform:'uppercase',letterSpacing:'0.08em',color:'var(--iron)',marginBottom:'12px',borderBottom:'1px solid #e8e2d9',paddingBottom:'8px'}}>Datos del cliente</p>
+                      {[['fa-user','Nombre',order.customerName],['fa-phone','Teléfono',order.phone],['fa-truck','Entrega',order.deliveryType.toUpperCase()]].map(([icon,label,val])=>(
+                        <div key={label} style={{display:'flex',gap:'10px',marginBottom:'10px',alignItems:'flex-start'}}>
+                          <i className={`fa-solid ${icon}`} style={{color:'var(--yellow)',fontSize:'13px',marginTop:'3px',width:'16px'}}></i>
+                          <div>
+                            <p style={{fontSize:'11px',color:'var(--silver)',textTransform:'uppercase',letterSpacing:'0.06em',margin:0}}>{label}</p>
+                            <p style={{fontWeight:600,fontSize:'15px',color:'var(--steel)',margin:0}}>{val}</p>
+                          </div>
+                        </div>
+                      ))}
+                      {order.deliveryType==='envio' && order.address && (
+                        <div style={{background:'#faf8f5',border:'1px solid #e8e2d9',borderRadius:'6px',padding:'8px 12px',fontSize:'13px',color:'var(--iron)'}}>
+                          <i className="fa-solid fa-location-dot" style={{color:'var(--yellow)',marginRight:'6px'}}></i>{order.address}
+                        </div>
+                      )}
+                      {order.observations && (
+                        <div style={{background:'#fffbeb',border:'1px solid #fde68a',borderRadius:'6px',padding:'8px 12px',fontSize:'13px',color:'#92400e',marginTop:'8px'}}>
+                          <strong>Obs:</strong> {order.observations}
+                        </div>
+                      )}
+                    </div>
+                    <div style={{background:'white',borderRadius:'8px',border:'1.5px solid #e8e2d9',padding:'16px 18px'}} className="print:hidden">
+                      <p style={{fontFamily:'Barlow Condensed',fontWeight:800,fontSize:'14px',textTransform:'uppercase',letterSpacing:'0.08em',color:'var(--iron)',marginBottom:'12px',borderBottom:'1px solid #e8e2d9',paddingBottom:'8px'}}>Acciones</p>
+                      <select value={order.status} onChange={e=>updateStatus(e.target.value)}
+                        style={{width:'100%',background:'var(--offwhite)',border:'2px solid #ddd7ce',borderRadius:'6px',padding:'10px 12px',fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'15px',color:'var(--steel)',outline:'none',marginBottom:'10px',cursor:'pointer'}}>
+                        {['Nuevo','En preparación','Preparado','Entregado','Enviado','Cancelado'].map(s=><option key={s} value={s}>→ {s}</option>)}
+                      </select>
+                      <button onClick={()=>window.print()} className="btn-dark" style={{width:'100%',height:'44px',display:'flex',alignItems:'center',justifyContent:'center',gap:'8px',fontSize:'16px'}}>
+                        <i className="fa-solid fa-print"></i> Imprimir Remito
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {/* Print ticket */}
+              <div className="hidden print:block" style={{background:'white',color:'black',padding:'16px',maxWidth:'80mm',margin:'0 auto',fontFamily:'monospace',fontSize:'12px',lineHeight:1.4}}>
+                <div style={{textAlign:'center',borderBottom:'1px solid black',paddingBottom:'8px',marginBottom:'12px'}}>
+                  <p style={{fontWeight:'bold',fontSize:'16px',textTransform:'uppercase'}}>PitaElectricidad</p>
+                  <p style={{fontSize:'10px'}}>Documento de preparación interno</p>
+                </div>
+                <p><strong>PEDIDO:</strong> {order.id}</p>
+                <p><strong>FECHA:</strong> {new Date(order.date).toLocaleString('es-AR')}</p>
+                <p><strong>CLIENTE:</strong> {order.customerName}</p>
+                <p><strong>TEL:</strong> {order.phone}</p>
+                <p style={{background:'black',color:'white',padding:'2px 4px',display:'inline-block',marginTop:'4px'}}><strong>ENTREGA: {order.deliveryType.toUpperCase()}</strong></p>
+                {order.deliveryType==='envio' && order.address && <p><strong>DIR:</strong> {order.address}</p>}
+                {order.observations && <div style={{border:'1px solid black',padding:'4px',margin:'8px 0',fontSize:'10px'}}><strong>OBS:</strong> {order.observations}</div>}
+                <div style={{borderTop:'1px solid black',borderBottom:'1px solid black',padding:'8px 0',margin:'10px 0'}}>
+                  {order.items.map((item,i)=>(
+                    <div key={i} style={{display:'flex',gap:'8px',marginBottom:'6px'}}>
+                      <span style={{fontWeight:'bold',fontSize:'14px'}}>x{item.quantity}</span>
+                      <span style={{fontSize:'11px',flex:1}}>{item.name}</span>
+                    </div>
+                  ))}
+                </div>
+                <p style={{textAlign:'right',fontWeight:'bold',fontSize:'14px'}}>TOTAL: {formatPrice(order.total)}</p>
+                <div style={{borderTop:'1px dashed black',marginTop:'24px',paddingTop:'12px',display:'flex',flexDirection:'column',gap:'16px',fontSize:'11px'}}>
+                  {['Preparado por','Controlado por','Entregado a','Firma'].map(l=>(
+                    <div key={l} style={{display:'flex',justifyContent:'space-between'}}>
+                      <span>{l}:</span>
+                      <span style={{borderBottom:'1px solid black',width:'90px',display:'inline-block'}}></span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          );
+        }
+
+        // ── ADMIN PRODUCTS ───────────────────────────────────────────────────
+        function AdminProductsView({ products, setProducts, categories, navigate, logout }) {
+          const [showForm, setShowForm] = useState(false);
+          const [editingProduct, setEditingProduct] = useState(null);
+          const [deleteConfirm, setDeleteConfirm] = useState(null);
+          const [searchTermProd, setSearchTermProd] = useState('');
+          const emptyForm = { name:'', desc:'', price:'', categoryId: categories[0]?.id||'', image:'', hasStock:true, isOffer:false, offerPrice:'' };
+          const [formData, setFormData] = useState(emptyForm);
+
+          const displayedProducts = searchTermProd ? products.filter(p=>p.name.toLowerCase().includes(searchTermProd.toLowerCase())) : products;
+
+          const openForm = (product=null) => {
+            setEditingProduct(product);
+            setFormData(product ? {...product} : emptyForm);
+            setShowForm(true);
+          };
+          const upd = (k,v) => setFormData(prev=>({...prev,[k]:v}));
+
+          const handleSave = (e) => {
+            e.preventDefault();
+            const p = {...formData, price:parseFloat(formData.price), offerPrice:formData.isOffer?parseFloat(formData.offerPrice):0, categoryId:parseInt(formData.categoryId)};
+            if (editingProduct) {
+              setProducts(products.map(pr=>pr.id===editingProduct.id?{...p,id:editingProduct.id}:pr));
+            } else {
+              setProducts([...products, {...p, id:Math.max(...products.map(x=>x.id))+1}]);
+            }
+            setShowForm(false);
+          };
+          const handleDelete = (id) => { setProducts(products.filter(p=>p.id!==id)); setDeleteConfirm(null); };
+
+          return (
+            <div style={{minHeight:'100vh',background:'#f0ede8'}} className="anim-in">
+              <div className="hidden md:block print:hidden"><AdminSidebar current="products" navigate={navigate} logout={logout}/></div>
+              <div className="md:hidden print:hidden"><AdminMobileNav navigate={navigate} logout={logout}/></div>
+              <div className="md:ml-56" style={{padding:'20px',maxWidth:'860px'}}>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'20px',flexWrap:'wrap',gap:'10px'}}>
+                  <h2 style={{fontFamily:'Barlow Condensed',fontWeight:900,fontSize:'28px',color:'var(--steel)',textTransform:'uppercase',letterSpacing:'0.04em',margin:0}}>Productos</h2>
+                  <button onClick={()=>openForm()} className="btn-primary" style={{padding:'10px 18px',fontSize:'15px',display:'flex',alignItems:'center',gap:'8px'}}>
+                    <i className="fa-solid fa-circle-plus"></i> Nuevo producto
+                  </button>
+                </div>
+
+                {showForm && (
+                  <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.55)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100,padding:'16px'}} className="anim-in">
+                    <div style={{background:'white',borderRadius:'10px',width:'100%',maxWidth:'520px',maxHeight:'90vh',overflowY:'auto',border:'3px solid var(--yellow)'}}>
+                      <div style={{background:'var(--steel)',padding:'16px 20px',display:'flex',justifyContent:'space-between',alignItems:'center',borderBottom:'3px solid var(--yellow)'}}>
+                        <h3 style={{fontFamily:'Barlow Condensed',fontWeight:900,fontSize:'22px',color:'white',textTransform:'uppercase',letterSpacing:'0.04em',margin:0}}>{editingProduct?'Editar Producto':'Nuevo Producto'}</h3>
+                        <button onClick={()=>setShowForm(false)} style={{background:'none',border:'none',color:'var(--silver)',cursor:'pointer',fontSize:'20px'}}><i className="fa-solid fa-xmark"></i></button>
+                      </div>
+                      <form onSubmit={handleSave} style={{padding:'20px',display:'flex',flexDirection:'column',gap:'14px'}}>
+                        <div>
+                          <label style={{display:'block',fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'13px',textTransform:'uppercase',letterSpacing:'0.08em',color:'var(--iron)',marginBottom:'5px'}}>Nombre</label>
+                          <input required type="text" className="input-field" value={formData.name} onChange={e=>upd('name',e.target.value)}/>
+                        </div>
+                        <div>
+                          <label style={{display:'block',fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'13px',textTransform:'uppercase',letterSpacing:'0.08em',color:'var(--iron)',marginBottom:'5px'}}>Descripción</label>
+                          <input required type="text" className="input-field" value={formData.desc} onChange={e=>upd('desc',e.target.value)}/>
+                        </div>
+                        <div>
+                          <label style={{display:'block',fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'13px',textTransform:'uppercase',letterSpacing:'0.08em',color:'var(--iron)',marginBottom:'5px'}}>Precio ($)</label>
+                          <input required type="number" min="0" className="input-field" value={formData.price} onChange={e=>upd('price',e.target.value)}/>
+                        </div>
+                        <div>
+                          <label style={{display:'block',fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'13px',textTransform:'uppercase',letterSpacing:'0.08em',color:'var(--iron)',marginBottom:'8px'}}>Imagen del producto</label>
+                          <div style={{display:'flex',gap:'10px',alignItems:'flex-start'}}>
+                            {/* Preview */}
+                            <div style={{width:'72px',height:'72px',borderRadius:'6px',border:'2px dashed #ddd7ce',background:'var(--offwhite)',overflow:'hidden',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center'}}>
+                              {formData.image
+                                ? <img src={formData.image} alt="preview" style={{width:'100%',height:'100%',objectFit:'cover'}}/>
+                                : <i className="fa-solid fa-image" style={{fontSize:'24px',color:'#c5bdb4'}}></i>
+                              }
+                            </div>
+                            {/* Buttons */}
+                            <div style={{flex:1,display:'flex',flexDirection:'column',gap:'6px'}}>
+                              <label style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'8px',background:'var(--steel)',color:'white',fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'14px',textTransform:'uppercase',letterSpacing:'0.05em',padding:'10px 14px',borderRadius:'6px',cursor:'pointer',transition:'background 0.15s'}}
+                                onMouseEnter={e=>e.currentTarget.style.background='var(--steel-light)'}
+                                onMouseLeave={e=>e.currentTarget.style.background='var(--steel)'}>
+                                <i className="fa-solid fa-upload"></i> Subir foto
+                                <input type="file" accept="image/*" style={{display:'none'}}
+                                  onChange={e=>{
+                                    const file = e.target.files[0];
+                                    if (!file) return;
+                                    const reader = new FileReader();
+                                    reader.onload = (ev) => upd('image', ev.target.result);
+                                    reader.readAsDataURL(file);
+                                  }}
+                                />
+                              </label>
+                              {formData.image && (
+                                <button type="button" onClick={()=>upd('image','')}
+                                  style={{background:'none',border:'1.5px solid #e8d5d5',color:'var(--rust)',fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'13px',textTransform:'uppercase',letterSpacing:'0.05em',padding:'6px 10px',borderRadius:'6px',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:'6px'}}>
+                                  <i className="fa-solid fa-trash"></i> Quitar
+                                </button>
+                              )}
+                              <p style={{fontSize:'11px',color:'var(--silver)',margin:0,lineHeight:1.4}}>JPG, PNG, WEBP. Se guarda en la app.</p>
+                            </div>
+                          </div>
+                        </div>
+                        <div>
+                          <label style={{display:'block',fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'13px',textTransform:'uppercase',letterSpacing:'0.08em',color:'var(--iron)',marginBottom:'5px'}}>Categoría</label>
+                          <select className="input-field" value={formData.categoryId} onChange={e=>upd('categoryId',e.target.value)}>
+                            {categories.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}
+                          </select>
+                        </div>
+                        <div style={{display:'flex',gap:'20px'}}>
+                          <label style={{display:'flex',alignItems:'center',gap:'8px',cursor:'pointer'}}>
+                            <input type="checkbox" checked={formData.hasStock} onChange={e=>upd('hasStock',e.target.checked)} style={{width:'18px',height:'18px'}}/>
+                            <span style={{fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'14px',color:'var(--steel)'}}>Tiene stock</span>
+                          </label>
+                          <label style={{display:'flex',alignItems:'center',gap:'8px',cursor:'pointer'}}>
+                            <input type="checkbox" checked={formData.isOffer} onChange={e=>upd('isOffer',e.target.checked)} style={{width:'18px',height:'18px',accentColor:'var(--rust)'}}/>
+                            <span style={{fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'14px',color:'var(--rust)'}}>Es oferta</span>
+                          </label>
+                        </div>
+                        {formData.isOffer && (
+                          <div className="anim-in">
+                            <label style={{display:'block',fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'13px',textTransform:'uppercase',letterSpacing:'0.08em',color:'var(--rust)',marginBottom:'5px'}}>Precio de oferta ($)</label>
+                            <input required type="number" min="0" className="input-field" style={{borderColor:'var(--rust)'}} value={formData.offerPrice} onChange={e=>upd('offerPrice',e.target.value)}/>
+                          </div>
+                        )}
+                        <div style={{display:'flex',gap:'10px',justifyContent:'flex-end',paddingTop:'8px',borderTop:'1px solid #e8e2d9'}}>
+                          <button type="button" onClick={()=>setShowForm(false)} style={{padding:'10px 18px',fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'15px',color:'var(--iron)',background:'var(--offwhite)',border:'1.5px solid #ddd7ce',borderRadius:'6px',cursor:'pointer'}}>Cancelar</button>
+                          <button type="submit" className="btn-dark" style={{padding:'10px 20px',fontSize:'15px'}}>Guardar</button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                )}
+
+                <div style={{background:'white',borderRadius:'8px',border:'1.5px solid #e8e2d9',overflow:'hidden'}}>
+                  <div style={{padding:'12px 16px',borderBottom:'1px solid #f0ede8',background:'#faf8f5',display:'flex',gap:'10px',alignItems:'center'}}>
+                    <div style={{position:'relative',flex:1,maxWidth:'360px'}}>
+                      <i className="fa-solid fa-magnifying-glass" style={{position:'absolute',left:'12px',top:'50%',transform:'translateY(-50%)',color:'var(--silver)',fontSize:'14px',pointerEvents:'none'}}></i>
+                      <input type="text" placeholder="Buscar producto..."
+                        style={{width:'100%',background:'white',border:'1.5px solid #ddd7ce',borderRadius:'6px',padding:'8px 12px 8px 36px',fontFamily:'Barlow',fontSize:'14px',color:'var(--steel)',outline:'none'}}
+                        value={searchTermProd} onChange={e=>setSearchTermProd(e.target.value)}/>
+                    </div>
+                    <span style={{fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'13px',color:'var(--silver)',textTransform:'uppercase',letterSpacing:'0.05em'}}>{displayedProducts.length} art.</span>
+                  </div>
+                  <div>
+                    {displayedProducts.length===0 ? (
+                      <div style={{padding:'40px',textAlign:'center',color:'var(--silver)'}}>
+                        <p style={{fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'18px'}}>Sin resultados</p>
+                      </div>
+                    ) : displayedProducts.map(product=>{
+                      const catName = categories.find(c=>c.id===product.categoryId)?.name;
+                      return (
+                        <div key={product.id} style={{padding:'12px 16px',display:'flex',alignItems:'center',gap:'12px',borderBottom:'1px solid #f0ede8',background:'white',transition:'background 0.12s'}}
+                          onMouseEnter={e=>e.currentTarget.style.background='#faf8f5'}
+                          onMouseLeave={e=>e.currentTarget.style.background='white'}>
+                          <img src={product.image} alt={product.name} style={{width:'52px',height:'52px',objectFit:'cover',borderRadius:'6px',border:'1.5px solid #e8e2d9',flexShrink:0}}/>
+                          <div style={{flex:1,minWidth:0}}>
+                            <p style={{fontWeight:700,fontSize:'14px',color:'var(--steel)',marginBottom:'3px',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{product.name}</p>
+                            <div style={{display:'flex',gap:'6px',alignItems:'center',flexWrap:'wrap'}}>
+                              <span style={{background:'var(--offwhite)',border:'1px solid #e8e2d9',fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'11px',textTransform:'uppercase',letterSpacing:'0.04em',color:'var(--iron)',padding:'2px 7px',borderRadius:'3px'}}>{catName}</span>
+                              {product.isOffer && <span style={{background:'#fee2e2',color:'#991b1b',fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'11px',textTransform:'uppercase',letterSpacing:'0.04em',padding:'2px 7px',borderRadius:'3px'}}>Oferta</span>}
+                              {!product.hasStock && <span style={{background:'#f1f5f9',color:'#94a3b8',fontFamily:'Barlow Condensed',fontWeight:700,fontSize:'11px',textTransform:'uppercase',letterSpacing:'0.04em',padding:'2px 7px',borderRadius:'3px',border:'1px solid #e2e8f0'}}>Sin stock</span>}
+                            </div>
+                          </div>
+                          <div style={{textAlign:'right',flexShrink:0,marginRight:'8px'}}>
+                            <div style={{fontFamily:'Barlow Condensed',fontWeight:900,fontSize:'17px',color:'var(--steel)'}}>{formatPrice(getProductPrice(product))}</div>
+                            {product.isOffer && <div style={{fontSize:'11px',color:'#aaa',textDecoration:'line-through'}}>{formatPrice(product.price)}</div>}
+                          </div>
+                          <div style={{display:'flex',gap:'4px',flexShrink:0}}>
+                            <button onClick={()=>openForm(product)}
+                              style={{background:'none',border:'none',color:'var(--silver)',cursor:'pointer',padding:'6px',borderRadius:'5px',fontSize:'15px',transition:'all 0.12s'}}
+                              onMouseEnter={e=>{e.currentTarget.style.color='var(--yellow)';e.currentTarget.style.background='#faf8f5';}}
+                              onMouseLeave={e=>{e.currentTarget.style.color='var(--silver)';e.currentTarget.style.background='none';}}>
+                              <i className="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            {deleteConfirm===product.id ? (
+                              <div style={{display:'flex',flexDirection:'column',gap:'3px',background:'#fee2e2',padding:'4px 6px',borderRadius:'6px',border:'1px solid #fecaca'}}>
+                                <span style={{fontFamily:'Barlow Condensed',fontWeight:800,fontSize:'10px',color:'var(--rust)',textTransform:'uppercase',textAlign:'center'}}>¿Seguro?</span>
+                                <div style={{display:'flex',gap:'3px'}}>
+                                  <button onClick={()=>handleDelete(product.id)} style={{background:'var(--rust)',color:'white',border:'none',borderRadius:'4px',padding:'3px 6px',cursor:'pointer',fontSize:'12px'}}><i className="fa-solid fa-check"></i></button>
+                                  <button onClick={()=>setDeleteConfirm(null)} style={{background:'#d1d5db',color:'#374151',border:'none',borderRadius:'4px',padding:'3px 6px',cursor:'pointer',fontSize:'12px'}}><i className="fa-solid fa-xmark"></i></button>
+                                </div>
+                              </div>
+                            ) : (
+                              <button onClick={()=>setDeleteConfirm(product.id)}
+                                style={{background:'none',border:'none',color:'var(--silver)',cursor:'pointer',padding:'6px',borderRadius:'5px',fontSize:'15px',transition:'all 0.12s'}}
+                                onMouseEnter={e=>{e.currentTarget.style.color='var(--rust)';e.currentTarget.style.background='#fee2e2';}}
+                                onMouseLeave={e=>{e.currentTarget.style.color='var(--silver)';e.currentTarget.style.background='none';}}>
+                                <i className="fa-solid fa-trash"></i>
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        }
+
+        // ── APP (solo state y routing) ────────────────────────────────────────
+        function App() {
+          const [currentView, setCurrentView] = useState('home');
+          const [isAdmin, setIsAdmin] = useState(false);
+          const [categories] = useState(initialCategories);
+          const [products, setProducts] = useState(initialProducts);
+          const [orders, setOrders] = useState([]);
+          const [cart, setCart] = useState([]);
+          const [selectedCategory, setSelectedCategory] = useState(null);
+          const [selectedProduct, setSelectedProduct] = useState(null);
+          const [selectedOrder, setSelectedOrder] = useState(null);
+          const [searchTerm, setSearchTerm] = useState('');
+          const [trackSearchId, setTrackSearchId] = useState('');
+          const [trackedOrder, setTrackedOrder] = useState(null);
+
+          const offers = useMemo(() => products.filter(p=>p.isOffer), [products]);
+          const cartTotal = useMemo(() => cart.reduce((a,i)=>a+i.price*i.quantity, 0), [cart]);
+          const cartItemCount = useMemo(() => cart.reduce((a,i)=>a+i.quantity, 0), [cart]);
+
+          const addToCart = useCallback((product, quantity=1) => {
+            if (!product.hasStock) return;
+            setCart(prev => {
+              const existing = prev.find(i=>i.product.id===product.id);
+              if (existing) return prev.map(i=>i.product.id===product.id?{...i,quantity:i.quantity+quantity}:i);
+              return [...prev, { product, quantity, price: getProductPrice(product) }];
+            });
+          }, []);
+
+          const updateCartQty = useCallback((productId, delta) => {
+            setCart(prev => prev.map(i=>i.product.id===productId?{...i,quantity:Math.max(1,i.quantity+delta)}:i));
+          }, []);
+
+          const removeFromCart = useCallback((productId) => {
+            setCart(prev => prev.filter(i=>i.product.id!==productId));
+          }, []);
+
+          const placeOrder = useCallback((formData) => {
+            setCart(prev => {
+              const total = prev.reduce((a,i)=>a+i.price*i.quantity, 0);
+              const newOrder = {
+                id: `PED-${Math.floor(1000+Math.random()*9000)}`,
+                date: new Date().toISOString(),
+                customerName: formData.name,
+                phone: formData.phone,
+                deliveryType: formData.deliveryType,
+                address: formData.deliveryType==='envio'?formData.address:'',
+                observations: formData.observations,
+                status: 'Nuevo',
+                total,
+                items: prev.map(i=>({ productId:i.product.id, name:i.product.name, price:i.price, quantity:i.quantity, subtotal:i.price*i.quantity }))
+              };
+              setOrders(o=>[newOrder,...o]);
+              setCurrentView('success');
+              return [];
+            });
+          }, []);
+
+          const logout = useCallback(() => { setIsAdmin(false); setCurrentView('home'); }, []);
+
+          // navigate also accepts an optional data payload
+          const navigate = useCallback((view, data) => {
+            if (view==='admin_order_detail' && data) setSelectedOrder(data);
+            setCurrentView(view);
+          }, []);
+
+          const sharedNav = <TopNav cartItemCount={cartItemCount} navigate={navigate}/>;
+
+          switch (currentView) {
+            case 'home':
+              return <React.Fragment>
+                {sharedNav}
+                <HomeView products={products} categories={categories} offers={offers} searchTerm={searchTerm} setSearchTerm={setSearchTerm} navigate={navigate} setSelectedCategory={setSelectedCategory} setSelectedProduct={setSelectedProduct}/>
+              </React.Fragment>;
+            case 'category':
+              return <React.Fragment>
+                {sharedNav}
+                <CategoryView category={selectedCategory} products={products} navigate={navigate} setSelectedProduct={setSelectedProduct}/>
+              </React.Fragment>;
+            case 'product':
+              return <ProductDetailView product={selectedProduct} categories={categories} addToCart={addToCart} navigate={navigate}/>;
+            case 'cart':
+              return <CartView cart={cart} cartTotal={cartTotal} updateCartQty={updateCartQty} removeFromCart={removeFromCart} navigate={navigate}/>;
+            case 'checkout':
+              return <CheckoutView cartTotal={cartTotal} placeOrder={placeOrder} navigate={navigate}/>;
+            case 'success':
+              return <SuccessView lastOrder={orders[0]} navigate={navigate}/>;
+            case 'track_order':
+              return <React.Fragment>
+                {sharedNav}
+                <TrackOrderView orders={orders} navigate={navigate} trackSearchId={trackSearchId} setTrackSearchId={setTrackSearchId} trackedOrder={trackedOrder} setTrackedOrder={setTrackedOrder}/>
+              </React.Fragment>;
+            case 'admin_login':
+              return <AdminLogin navigate={navigate} setIsAdmin={setIsAdmin}/>;
+            case 'admin_orders':
+              return isAdmin ? <AdminOrdersView orders={orders} navigate={navigate} logout={logout}/> : <AdminLogin navigate={navigate} setIsAdmin={setIsAdmin}/>;
+            case 'admin_order_detail':
+              return isAdmin ? <AdminOrderDetailView order={selectedOrder} orders={orders} setOrders={setOrders} setSelectedOrder={setSelectedOrder} navigate={navigate} logout={logout}/> : <AdminLogin navigate={navigate} setIsAdmin={setIsAdmin}/>;
+            case 'admin_products':
+              return isAdmin ? <AdminProductsView products={products} setProducts={setProducts} categories={categories} navigate={navigate} logout={logout}/> : <AdminLogin navigate={navigate} setIsAdmin={setIsAdmin}/>;
+            default:
+              return <React.Fragment>
+                {sharedNav}
+                <HomeView products={products} categories={categories} offers={offers} searchTerm={searchTerm} setSearchTerm={setSearchTerm} navigate={navigate} setSelectedCategory={setSelectedCategory} setSelectedProduct={setSelectedProduct}/>
+              </React.Fragment>;
+          }
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
